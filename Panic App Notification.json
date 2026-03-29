@@ -1,0 +1,213 @@
+{
+  "name": "Panic App Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "27f055d7-5b96-48cc-a378-c833f76fb83f",
+      "name": "WhatsApp Trigger",
+      "webhookId": "96b32e48-898c-41de-9f71-cf8dcc0e9fc6",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "SC6hOVbCl1GLrCBd",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10798OkKO-Z58DojILLXp7UZLbUbZo0rGFnheO8p7tHw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10798OkKO-Z58DojILLXp7UZLbUbZo0rGFnheO8p7tHw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "WhatsAppNumber",
+              "lookupValue": "={{ $json.contacts[0].wa_id.slice(-10) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "84e8432f-43dc-474a-9776-ffe09a675694",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FhmUrCGRtuDa17m2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1PMmhfFdY8ChP6XDmMOlvOdT6BgykZuNCCOdHyHyeQAs",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PMmhfFdY8ChP6XDmMOlvOdT6BgykZuNCCOdHyHyeQAs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "BlockName",
+              "lookupValue": "={{ $json.Address2 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "58316128-01b8-436c-9d6f-f4bf5a8d0b70",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FhmUrCGRtuDa17m2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Emergency {{ $json.BlockName }}",
+        "emailType": "text",
+        "message": "=Name:  {{ $('Get row(s) in sheet').item.json.FirstName }} {{ $('Get row(s) in sheet').item.json.LastName }}\nEmail: {{ $('Get row(s) in sheet').item.json.Email }}\nContact: {{ $('Get row(s) in sheet').item.json.WhatsAppNumber }}\n\nAddress: {{ $('Get row(s) in sheet').item.json.Address1 }}, {{ $('Get row(s) in sheet').item.json.Address2 }}\n\n--------------------------\n\nMessage: {{ $('WhatsApp Trigger').item.json.messages[0].text.body }}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0b310ca6-91db-4291-90a1-5c25c237df81",
+      "name": "Send a message",
+      "webhookId": "889aad3d-20cf-4d79-964c-b3ca9f1204c4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "cCETAdhyXStL5RKs",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1090210054169433",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "=Hey *{{ $('Get row(s) in sheet').item.json.FirstName }}*,\nThanks for reaching out to us,\nThe respective authorities of *{{ $('Get row(s) in sheet1').item.json.BlockName }}* have been informed, help will be arriving shortly.\n\n*Panic Support Team*.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "efe24531-9c53-4717-97db-2ff085d95f3b",
+      "name": "Send message",
+      "webhookId": "82307f06-3869-4531-9f6f-9cea0bf5221e",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "rLblIxsUmeogWHJe",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4ef14023-b088-4e10-a7e1-8bff3067edb0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2c6ddbb4fd69d8d1f90f17123aefb3bd07b1120386452493fc75538cf7835e76"
+  },
+  "id": "chig10dl9EMy46kf",
+  "tags": []
+}
