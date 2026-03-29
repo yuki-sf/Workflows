@@ -1,0 +1,115 @@
+{
+  "name": "Top 5 Result ChatBot",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "35f79f12-e897-4d36-bed4-09ecfd43b07d",
+      "name": "When chat message received",
+      "webhookId": "e54c2971-43f2-41d9-96fc-1bd9f8cb56e8"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "# Role:\nYou provide the top 5 responses to the user query, without any explanation.\n\n# Example:\nTop 5 Cricket nations will look like,\n1. India\n2. Australia\n3. New Zealand\n4. England\n5. South Africa"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "87908c28-5e65-48fd-9862-77cfbd002c00",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "681cf297-4f12-419f-8165-8e0cfd3260ed",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9SWqFvfa8QP7lBKf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "be0ba3af-5a31-4e5b-ab14-c24fb1f31ba5",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3ae78e20-64d7-4fc6-b33d-f7540a8c9afc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aa2b26250e9ac733eb9dd38c7a12ffa5e51f5e68d2b80c560a7ce0fbfd8b83db"
+  },
+  "id": "OCyo9ll12Gc8eVvJ",
+  "tags": []
+}
