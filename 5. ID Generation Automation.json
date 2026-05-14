@@ -1,0 +1,578 @@
+{
+  "name": "5. ID Generation Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "inputDataFieldName": "Image",
+        "name": "={{ $json.data.Name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1s2l2IMH7lvoBMmBWYRfmLN5vlZhZ8BJl",
+          "mode": "list",
+          "cachedResultName": "Image",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1s2l2IMH7lvoBMmBWYRfmLN5vlZhZ8BJl"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        -128
+      ],
+      "id": "49a1da75-9699-4e47-8701-a678f3587d69",
+      "name": "Upload Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone",
+            "allowFileDiscovery": true
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        528,
+        128
+      ],
+      "id": "1b596e89-b064-41e9-8dd0-4c4ebcb92845",
+      "name": "Share Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "18ev933FZm4_3uV5l6H0z9MSFDFTczGetN9C-i2lDh7M",
+          "mode": "id"
+        },
+        "name": "={{ $('Send message and wait for response').item.json.data.Name }} ID",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1mJLtRCyipbs4PHZk1wXUnTHkvyV0BbVT",
+          "mode": "list",
+          "cachedResultName": "ID",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mJLtRCyipbs4PHZk1wXUnTHkvyV0BbVT"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        752,
+        128
+      ],
+      "id": "10b2d88f-61af-46bc-a1c2-7e766a60711e",
+      "name": "Copy ID",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get current date components\nconst now = new Date();\nconst year = now.getFullYear(); // 2026\nconst month = (now.getMonth() + 1).toString().padStart(2, '0'); // 04\nconst day = now.getDate().toString().padStart(2, '0'); // 24\n\n// Generate a 4-digit random serial\nconst serial = Math.floor(1000 + Math.random() * 9000); \n\n// Construct numeric ID: [YYYY][MM][DD][SERIAL]\nconst employeeId = `${year}${month}${day}${serial}`;\n\nreturn {\n  employee_id: employeeId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        128
+      ],
+      "id": "d112856f-06c3-44b7-81a8-0d588b57c8f9",
+      "name": "Generate ID"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://slides.googleapis.com/v1/presentations/{{ $('Copy ID').item.json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSlidesOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\": [\n    {\n      \"replaceAllShapesWithImage\": {\n        \"imageUrl\": \"https://images.weserv.nl/?url={{ encodeURIComponent($node['Upload Image'].json.webContentLink.replace('https://', '')) }}&w=600&h=600&fit=cover&mask=circle&output=png\",\n        \"replaceMethod\": \"CENTER_CROP\",\n        \"containsText\": {\n          \"text\": \"IMG\",\n          \"matchCase\": true\n        }\n      }\n    },\n    {\n      \"replaceAllShapesWithImage\": {\n        \"imageUrl\": \"https://bwipjs-api.metafloor.com/?bcid=code128&text={{ $json.employee_id }}&scale=4&width=120&height=12&backgroundcolor=ffffff\",\n        \"replaceMethod\": \"CENTER_INSIDE\",\n        \"containsText\": {\n          \"text\": \"BAR_CODE_HERE\",\n          \"matchCase\": true\n        }\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        528,
+        368
+      ],
+      "id": "60dbafe0-2987-49e2-890d-94ace6df7f5e",
+      "name": "Update Image and Bar Code",
+      "credentials": {
+        "googleSlidesOAuth2Api": {
+          "id": "BsBNAisOO05qPDdo",
+          "name": "Google Slides OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "replaceText",
+        "presentationId": "={{ $('Copy ID').item.json.id }}",
+        "textUi": {
+          "textValues": [
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{name}}",
+              "replaceText": "={{ $('Send message and wait for response').item.json.data.Name }}"
+            },
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{role}}",
+              "replaceText": "={{ $('Webhook').item.json.query.role }}"
+            },
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{id}}",
+              "replaceText": "={{ $('Generate ID').item.json.employee_id }}"
+            },
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{blood}}",
+              "replaceText": "={{ $('Send message and wait for response').item.json.data['Blood Group'] }}"
+            },
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{email}}",
+              "replaceText": "=sam@wework.in"
+            },
+            {
+              "matchCase": true,
+              "pageObjectIds": [
+                "p"
+              ],
+              "text": "{{phone}}",
+              "replaceText": "={{ $('Send message and wait for response').item.json.data['Phone No.'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSlides",
+      "typeVersion": 2,
+      "position": [
+        736,
+        368
+      ],
+      "id": "9169a1ef-19dc-452b-b35e-5076f794a4e7",
+      "name": "Update ID",
+      "credentials": {
+        "googleSlidesOAuth2Api": {
+          "id": "BsBNAisOO05qPDdo",
+          "name": "Google Slides OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.presentationId }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "slidesToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        368
+      ],
+      "id": "5bece922-047a-44ab-a75b-f185492cc2dd",
+      "name": "Convert to PDF",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Copy ID').item.json.name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1mJLtRCyipbs4PHZk1wXUnTHkvyV0BbVT",
+          "mode": "list",
+          "cachedResultName": "ID",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mJLtRCyipbs4PHZk1wXUnTHkvyV0BbVT"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        528,
+        592
+      ],
+      "id": "978eb523-feba-4088-abdd-dbb01fceca38",
+      "name": "Upload ID",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        736,
+        592
+      ],
+      "id": "c16fe83c-5329-495b-8758-2a177f7003f3",
+      "name": "Share ID",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Update ID').item.json.presentationId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        592
+      ],
+      "id": "5a592e57-4cb0-4d4c-8707-302765963a06",
+      "name": "Delete Temp ID",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "={{ $json.query.email }}",
+        "subject": "Details for ID Creation",
+        "message": "Please Enter Your Correct Details To Create Your Company ID Card.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Enter the Name you like to be called.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Phone No.",
+              "placeholder": "Enter Your Phone No.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Blood Group",
+              "placeholder": "Enter your Blood Group",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".jpg,.png,.jpeg",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 45,
+              "resumeUnit": "minutes"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -128
+      ],
+      "id": "9b05914e-18ab-40ea-9b38-daffccc22ac7",
+      "name": "Send message and wait for response",
+      "webhookId": "ab5e9ba8-401e-4418-b4e5-fac3854fc62f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "id-card",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        -128
+      ],
+      "id": "9c95ed46-b35f-4a7c-8939-9e7218c55c57",
+      "name": "Webhook",
+      "webhookId": "cf73287c-e515-4db4-a69b-9f6e90c1d638",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"ID_Card\": \"{{ $('Upload ID').item.json.id }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1168,
+        592
+      ],
+      "id": "d1d99512-5747-43ee-ba5d-641a988c3b3a",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Share Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share Image": {
+      "main": [
+        [
+          {
+            "node": "Copy ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy ID": {
+      "main": [
+        [
+          {
+            "node": "Generate ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate ID": {
+      "main": [
+        [
+          {
+            "node": "Update Image and Bar Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Image and Bar Code": {
+      "main": [
+        [
+          {
+            "node": "Update ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update ID": {
+      "main": [
+        [
+          {
+            "node": "Convert to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload ID": {
+      "main": [
+        [
+          {
+            "node": "Share ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share ID": {
+      "main": [
+        [
+          {
+            "node": "Delete Temp ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Temp ID": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "435c5026-0bcc-464a-94f2-23e20a3c4fce",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f596318a6c87b9ecf5b99de2a888e1d8d4225b868e289ef3610d8c489e81edd"
+  },
+  "id": "DJLJrhp3lHyvcFY7",
+  "tags": []
+}
