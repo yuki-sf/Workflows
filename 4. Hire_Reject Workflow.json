@@ -1,0 +1,555 @@
+{
+  "name": "4. Hire/Reject Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "hire-reject",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -864,
+        112
+      ],
+      "id": "c21dc0f8-0307-43f7-9322-09b181466ad7",
+      "name": "Webhook",
+      "webhookId": "71721722-e774-4c59-8d68-293b9d4e8e21"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "Name",
+              "field2": "Name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -416,
+        112
+      ],
+      "id": "9db5df79-548b-45f0-9a07-701abeda2d80",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Interview Vector Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 249424902,
+          "mode": "list",
+          "cachedResultName": "HR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit#gid=249424902"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -640,
+        16
+      ],
+      "id": "9a7fc00a-e880-4b36-b618-25a5ca3f6f3f",
+      "name": "HR Score",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIp7Cr5PCM680JSY",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Interview Vector Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2084511208,
+          "mode": "list",
+          "cachedResultName": "Result",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit#gid=2084511208"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -640,
+        208
+      ],
+      "id": "080a0a87-f9e7-4294-aad8-13eee228cd9c",
+      "name": "AI Score",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIp7Cr5PCM680JSY",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Candidate Email'] }}",
+        "subject": "Congratulations! You Have Been Selected",
+        "message": "=<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f5f7f9;padding:40px 20px;font-family:'Segoe UI',Arial,sans-serif;\">\n\n  <tr>\n    <td align=\"center\">\n\n      <!-- Main Card -->\n      <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n        style=\"\n          max-width:640px;\n          background:#ffffff;\n          border-radius:18px;\n          padding:50px 42px;\n          box-shadow:0 4px 20px rgba(0,0,0,0.05);\n        \">\n\n        <!-- Top -->\n        <tr>\n          <td align=\"center\">\n\n            <div style=\"\n              width:64px;\n              height:64px;\n              line-height:64px;\n              border-radius:50%;\n              background:#ecfdf5;\n              font-size:30px;\n              text-align:center;\n              margin-bottom:28px;\n            \">\n              🎉\n            </div>\n\n            <h1 style=\"\n              margin:0;\n              font-size:34px;\n              color:#111827;\n              font-weight:700;\n              letter-spacing:-0.5px;\n            \">\n              You’re Selected\n            </h1>\n\n            <p style=\"\n              margin-top:14px;\n              font-size:16px;\n              color:#6b7280;\n              line-height:1.7;\n              max-width:480px;\n            \">\n              Congratulations on successfully clearing all stages of our recruitment process.\n            </p>\n\n          </td>\n        </tr>\n\n        <!-- Divider -->\n        <tr>\n          <td style=\"padding:35px 0 10px 0;\">\n            <div style=\"height:1px;background:#e5e7eb;\"></div>\n          </td>\n        </tr>\n\n        <!-- Content -->\n        <tr>\n          <td>\n\n            <p style=\"\n              font-size:16px;\n              color:#374151;\n              line-height:1.8;\n              margin-top:20px;\n            \">\n              Dear <strong>{{ $json['Candidate Name'] }}</strong>,\n            </p>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              We are pleased to offer you the role of\n            </p>\n\n            <!-- Role -->\n            <div style=\"\n              margin:28px 0;\n              padding:22px;\n              border-radius:14px;\n              background:#f0fdfa;\n              border:1px solid #ccfbf1;\n              text-align:center;\n            \">\n\n              <div style=\"\n                font-size:13px;\n                text-transform:uppercase;\n                letter-spacing:1.4px;\n                color:#0f766e;\n                font-weight:600;\n                margin-bottom:10px;\n              \">\n                Selected Role\n              </div>\n\n              <div style=\"\n                font-size:28px;\n                font-weight:700;\n                color:#115e59;\n                line-height:1.4;\n              \">\n                {{ $json['Candidate Role'] }}\n              </div>\n\n            </div>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              Our onboarding team will contact you shortly regarding employee ID verification, required documents, joining formalities, and next steps.\n            </p>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              We look forward to welcoming you to the team.\n            </p>\n\n            <!-- Signature -->\n            <div style=\"margin-top:42px;\">\n\n              <p style=\"\n                margin:0;\n                font-size:15px;\n                color:#6b7280;\n              \">\n                Best Regards,\n              </p>\n\n              <p style=\"\n                margin-top:8px;\n                font-size:16px;\n                font-weight:600;\n                color:#111827;\n              \">\n                HR Recruitment Team\n              </p>\n\n            </div>\n\n          </td>\n        </tr>\n\n      </table>\n\n    </td>\n  </tr>\n\n</table>\n\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "8a72babc-9a2b-43c2-b217-eb67a705f9db",
+      "name": "Send a message",
+      "webhookId": "a839be93-6e46-4947-9477-b7b630239bc2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Candidate Email'] }}",
+        "subject": "Update Regarding Your Application",
+        "message": "=<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\nstyle=\"\n  background:#f5f7f9;\n  padding:40px 20px;\n  font-family:'Segoe UI',Arial,sans-serif;\n\">\n\n  <tr>\n    <td align=\"center\">\n\n      <!-- Main Card -->\n      <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n      style=\"\n        max-width:650px;\n        background:#ffffff;\n        border-radius:18px;\n        padding:48px 42px;\n        box-shadow:0 4px 24px rgba(0,0,0,0.06);\n      \">\n\n        <!-- Header -->\n        <tr>\n          <td align=\"center\">\n\n            <!-- Centered Icon -->\n            <table \n              cellpadding=\"0\" \n              cellspacing=\"0\" \n              border=\"0\" \n              align=\"center\"\n              style=\"\n                margin:auto;\n                margin-bottom:24px;\n              \"\n            >\n              <tr>\n                <td\n                  align=\"center\"\n                  valign=\"middle\"\n                  width=\"70\"\n                  height=\"70\"\n                  style=\"\n                    width:70px;\n                    height:70px;\n                    background:#fef2f2;\n                    border-radius:50%;\n                    font-size:34px;\n                    text-align:center;\n                    vertical-align:middle;\n                  \"\n                >\n                  📩\n                </td>\n              </tr>\n            </table>\n\n            <!-- Title -->\n            <h1 style=\"\n              margin:0;\n              font-size:32px;\n              color:#111827;\n              font-weight:700;\n              letter-spacing:-0.4px;\n            \">\n              Application Update\n            </h1>\n\n            <!-- Subtitle -->\n            <p style=\"\n              color:#6b7280;\n              font-size:16px;\n              line-height:1.7;\n              max-width:480px;\n              margin:14px auto 0 auto;\n            \">\n              Thank you for participating in our recruitment process.\n            </p>\n\n          </td>\n        </tr>\n\n        <!-- Divider -->\n        <tr>\n          <td style=\"padding:34px 0 10px 0;\">\n            <div style=\"\n              height:1px;\n              background:#e5e7eb;\n            \"></div>\n          </td>\n        </tr>\n\n        <!-- Body -->\n        <tr>\n          <td>\n\n            <p style=\"\n              font-size:15px;\n              color:#374151;\n              line-height:1.9;\n              margin-top:20px;\n            \">\n              Dear \n              <strong>{{ $json['Candidate Name'] }}</strong>,\n            </p>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              Thank you for taking the time to participate in our interview and evaluation process for the \n              <strong>{{ $json['Candidate Role'] }}</strong> position.\n            </p>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              After careful consideration, we regret to inform you that we will not be moving forward with your application at this time.\n            </p>\n\n            <!-- Message Card -->\n            <div style=\"\n              margin-top:30px;\n              padding:24px;\n              border-radius:16px;\n              background:#fafafa;\n              border:1px solid #e5e7eb;\n            \">\n\n              <p style=\"\n                margin:0;\n                font-size:15px;\n                color:#4b5563;\n                line-height:1.9;\n                text-align:center;\n              \">\n                We sincerely appreciate your interest in our organization and encourage you to apply for future opportunities that align with your skills and experience.\n              </p>\n\n            </div>\n\n            <p style=\"\n              margin-top:30px;\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              We wish you all the very best in your professional journey and future endeavors.\n            </p>\n\n            <!-- Signature -->\n            <div style=\"margin-top:42px;\">\n\n              <p style=\"\n                margin:0;\n                font-size:15px;\n                color:#6b7280;\n              \">\n                Best Regards,\n              </p>\n\n              <p style=\"\n                margin-top:8px;\n                font-size:16px;\n                font-weight:600;\n                color:#111827;\n              \">\n                HR Recruitment Team\n              </p>\n\n            </div>\n\n          </td>\n        </tr>\n\n      </table>\n\n    </td>\n  </tr>\n\n</table>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        224
+      ],
+      "id": "40ea1c52-c85f-4766-b256-583c0a2e8c31",
+      "name": "Send a message1",
+      "webhookId": "a839be93-6e46-4947-9477-b7b630239bc2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Interview Vector Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 302908962,
+          "mode": "list",
+          "cachedResultName": "Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit#gid=302908962"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Candidate Name",
+              "lookupValue": "={{ $json.Name }}"
+            },
+            {
+              "lookupColumn": "Candidate ID",
+              "lookupValue": "={{ $json['User ID'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5ffa9c79-89db-4d76-8b17-419df9fe4523",
+      "name": "Get Details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIp7Cr5PCM680JSY",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Interview Vector Store",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 302908962,
+          "mode": "list",
+          "cachedResultName": "Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit#gid=302908962"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Candidate Name",
+              "lookupValue": "={{ $json.Name }}"
+            },
+            {
+              "lookupColumn": "Candidate ID",
+              "lookupValue": "={{ $json['User ID'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        224
+      ],
+      "id": "a1c0a516-edb6-4945-8707-68e5f07172fc",
+      "name": "Get Detail",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIp7Cr5PCM680JSY",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "64632923-9796-4a7c-8aa8-162901c1274c",
+              "leftValue": "={{ ['Pass', 'Neutral'].includes($json['Hire Recommendation']) }}",
+              "rightValue": "Pass",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8f8b2f7c-85a6-4db7-8c15-53ee5a44fc28",
+              "leftValue": "={{ ['Good Fit', 'Great Fit'].includes($json[\"Culture Fit\"]) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "6d81c023-4f9a-4132-9ecd-1645490e2849",
+              "leftValue": "={{ ['Neutral','Leaning Hire', 'Hire', 'Strong Hire'].includes($json['HR Hire Recommendation']) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a65a9326-1cd1-4fa3-8972-35d7083f14fd",
+              "leftValue": "={{ ['Good', 'Very Good', 'Excellent'].includes($json['Communication Skills']) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "915f42e4-c667-45d9-bee3-36d8ece7c975",
+              "leftValue": "={{ ['Moderate', 'High', 'Exceptional'].includes($json['Confidence Level']) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c5c5d2cd-f519-4079-bdcb-8cd43612a264",
+              "leftValue": "={{ [ 'Good', 'Excellent', 'Outstanding'].includes($json['Technical Understanding']) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        112
+      ],
+      "id": "0030bcb2-5558-4db3-971a-c39351d90e95",
+      "name": "If Selected"
+    },
+    {
+      "parameters": {
+        "url": "https://yukisf.app.n8n.cloud/webhook/id-card",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $('Get Details').item.json['Candidate Email'] }}"
+            },
+            {
+              "name": "role",
+              "value": "={{ $('Get Details').item.json['Candidate Role'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        384,
+        0
+      ],
+      "id": "17ee6286-0f7e-4e10-bef0-f300470e4749",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get Details').item.json['Candidate Email'] }}",
+        "subject": "Welcome to the Team — Joining Details & Employee ID Card",
+        "message": "=<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\nstyle=\"background:#f5f7f9;padding:40px 20px;font-family:'Segoe UI',Arial,sans-serif;\">\n\n  <tr>\n    <td align=\"center\">\n\n      <!-- Main Card -->\n      <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"\n      style=\"\n        max-width:680px;\n        background:#ffffff;\n        border-radius:20px;\n        padding:48px 42px;\n        box-shadow:0 4px 24px rgba(0,0,0,0.06);\n      \">\n\n        <!-- Header -->\n        <tr>\n          <td align=\"center\">\n\n            <div style=\"\n              width:70px;\n              height:70px;\n              border-radius:50%;\n              background:#ecfdf5;\n              line-height:70px;\n              font-size:34px;\n              margin-bottom:24px;\n              text-align:center;\n            \">\n              🪪\n            </div>\n\n            <h1 style=\"\n              margin:0;\n              font-size:34px;\n              color:#111827;\n              font-weight:700;\n            \">\n              Welcome Aboard\n            </h1>\n\n            <p style=\"\n              margin-top:14px;\n              color:#6b7280;\n              font-size:16px;\n              line-height:1.7;\n            \">\n              Your onboarding process has been initiated successfully.\n            </p>\n\n          </td>\n        </tr>\n\n        <!-- Divider -->\n        <tr>\n          <td style=\"padding:32px 0 8px 0;\">\n            <div style=\"height:1px;background:#e5e7eb;\"></div>\n          </td>\n        </tr>\n\n        <!-- Body -->\n        <tr>\n          <td>\n\n            <p style=\"\n              font-size:16px;\n              color:#374151;\n              line-height:1.8;\n              margin-top:20px;\n            \">\n              Dear \n              <strong>\n                {{ $('Get Details').item.json['Candidate Name'] }}\n              </strong>,\n            </p>\n\n            <p style=\"\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              We are excited to officially welcome you to our organization. Please find your employee ID card and joining details below.\n            </p>\n\n            <!-- Joining Details -->\n            <div style=\"\n              margin-top:30px;\n              padding:24px;\n              border-radius:16px;\n              background:#f9fafb;\n              border:1px solid #e5e7eb;\n            \">\n\n              <div style=\"\n                font-size:13px;\n                text-transform:uppercase;\n                letter-spacing:1.2px;\n                color:#0f766e;\n                font-weight:600;\n                margin-bottom:18px;\n              \">\n                Joining Details\n              </div>\n\n              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n\n                <tr>\n                  <td style=\"padding:8px 0;color:#6b7280;font-size:14px;\">\n                    Joining Date\n                  </td>\n\n                  <td align=\"right\" style=\"padding:8px 0;color:#111827;font-size:14px;font-weight:600;\">\n                    15 July 2026\n                  </td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:8px 0;color:#6b7280;font-size:14px;\">\n                    Reporting Time\n                  </td>\n\n                  <td align=\"right\" style=\"padding:8px 0;color:#111827;font-size:14px;font-weight:600;\">\n                    9:30 AM\n                  </td>\n                </tr>\n\n                <tr>\n                  <td style=\"padding:8px 0;color:#6b7280;font-size:14px;\">\n                    Work Location\n                  </td>\n\n                  <td align=\"right\" style=\"padding:8px 0;color:#111827;font-size:14px;font-weight:600;\">\n                    Bengaluru Office\n                  </td>\n                </tr>\n\n              </table>\n\n            </div>\n\n\n            </div>\n\n            <!-- Footer Text -->\n            <p style=\"\n              margin-top:40px;\n              font-size:15px;\n              color:#4b5563;\n              line-height:1.9;\n            \">\n              Please carry a valid government ID proof on your joining day and report to the office reception at the scheduled time.\n            </p>\n\n            <!-- Signature -->\n            <div style=\"margin-top:42px;\">\n\n              <p style=\"\n                margin:0;\n                font-size:15px;\n                color:#6b7280;\n              \">\n                Best Regards,\n              </p>\n\n              <p style=\"\n                margin-top:8px;\n                font-size:16px;\n                font-weight:600;\n                color:#111827;\n              \">\n                HR Recruitment Team\n              </p>\n\n            </div>\n\n          </td>\n        </tr>\n\n      </table>\n\n    </td>\n  </tr>\n\n</table>\n\n",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "0ecc66d8-a616-4df9-b488-dc75b0d206b4",
+      "name": "Send a message2",
+      "webhookId": "65d5dfb4-3087-46bf-8e6f-9fc69dfbf55c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.ID_Card }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "6d5fe3d1-e6e8-4ceb-a66f-94f9bed62d4e",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Score",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HR Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR Score": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Score": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "If Selected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Details": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Detail": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Selected": {
+      "main": [
+        [
+          {
+            "node": "Get Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5a8c63ca-93f5-40ce-ac03-dd5fc4c59890",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f596318a6c87b9ecf5b99de2a888e1d8d4225b868e289ef3610d8c489e81edd"
+  },
+  "id": "gFKIcdi9x0X0u5Ht",
+  "tags": []
+}
