@@ -1,0 +1,555 @@
+{
+  "name": "3. HR Interview Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "automatedn8nworkflow@gmail.com",
+          "mode": "list",
+          "cachedResultName": "automatedn8nworkflow@gmail.com"
+        },
+        "limit": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "fa6ab05d-421a-4242-9933-b1cf1e4b225b",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gigYxM7aYNTCeej7",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "c2dc3697-24f5-4f5a-a460-c06307a081f4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.attendees[0].email }}",
+        "subject": "Interview Schedule Confirmation",
+        "message": "=<div style=\"background-color:#f4f7fb;padding:40px 20px;font-family:Arial,sans-serif;\">\n  \n  <div style=\"max-width:650px;margin:auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.08);\">\n    \n    <!-- Header -->\n    <div style=\"background:linear-gradient(135deg,#2563eb,#1e40af);padding:30px;text-align:center;color:white;\">\n      <h1 style=\"margin:0;font-size:28px;\">Interview Scheduled</h1>\n      <p style=\"margin-top:10px;font-size:15px;opacity:0.9;\">\n        Your interview has been successfully confirmed\n      </p>\n    </div>\n\n    <!-- Body -->\n    <div style=\"padding:35px;color:#333333;line-height:1.7;\">\n\n      <p style=\"font-size:16px;\">\n        Dear \n        <strong style=\"color:#2563eb;\">\n          {{ $json.summary.replace('Interview with ', '') }}\n        </strong>,\n      </p>\n\n      <p style=\"font-size:15px;\">\n        We are pleased to inform you that your interview has been successfully scheduled. Please find the details below.\n      </p>\n\n      <!-- Details Card -->\n      <div style=\"background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:25px;margin:25px 0;\">\n\n        <h2 style=\"margin-top:0;color:#1e40af;font-size:20px;\">\n          Interview Details\n        </h2>\n\n        <table style=\"width:100%;border-collapse:collapse;font-size:15px;\">\n          \n          <tr>\n            <td style=\"padding:10px 0;font-weight:bold;width:160px;\">Duration</td>\n            <td>Approximately 1 Hour</td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:10px 0;font-weight:bold;\">Platform</td>\n            <td>Google Meet</td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:10px 0;font-weight:bold;\">Date & Time</td>\n            <td>\n              {{ \n              new Date($json.start.dateTime).toLocaleString('en-IN', {\n                dateStyle: 'full',\n                timeStyle: 'short'\n              }) \n              }}\n              <br>\n              to\n              {{ \n              new Date($json.end.dateTime).toLocaleTimeString('en-IN', {\n                timeStyle: 'short'\n              }) \n              }}\n            </td>\n          </tr>\n\n        </table>\n\n        <!-- Meet Button -->\n        <div style=\"text-align:center;margin-top:30px;\">\n          <a \n            href=\"{{ $json.conferenceData.entryPoints[0].uri }}\"\n            style=\"\n              background:linear-gradient(135deg,#2563eb,#1d4ed8);\n              color:white;\n              text-decoration:none;\n              padding:14px 28px;\n              border-radius:10px;\n              font-weight:bold;\n              display:inline-block;\n              font-size:15px;\n            \"\n          >\n            Join Google Meet\n          </a>\n        </div>\n\n      </div>\n\n      <p style=\"font-size:15px;\">\n        Please join the meeting a few minutes before the scheduled time and ensure that your internet connection, microphone, and camera are functioning properly.\n      </p>\n\n      <p style=\"font-size:15px;\">\n        If you face any issues joining the meeting, kindly contact the HR team or reply to this email.\n      </p>\n\n      <p style=\"font-size:15px;\">\n        We look forward to the interaction.\n      </p>\n\n      <br>\n\n      <p style=\"margin-bottom:0;\">\n        Best Regards,\n      </p>\n\n      <p style=\"margin-top:5px;font-weight:bold;color:#1e40af;font-size:16px;\">\n        HR Recruitment Team\n      </p>\n\n    </div>\n\n    <!-- Footer -->\n    <div style=\"background:#eff6ff;padding:18px;text-align:center;font-size:13px;color:#64748b;\">\n      This is an automated interview scheduling email.\n    </div>\n\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        288
+      ],
+      "id": "09dd51fa-7ed5-4e76-a04b-bc89ef0e0368",
+      "name": "Send a message",
+      "webhookId": "1322406b-93ed-477e-9ba2-60a0f814f856",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fQOyNrz0sP6DCsCt",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        288
+      ],
+      "id": "0fd1aba8-99da-489c-a045-1d24c1f2544a",
+      "name": "Save Data"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "automatedn8nworkflow+HR@gmail.com",
+        "subject": "Interview Schedule Confirmation",
+        "message": "=<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background-color:#f4f7fb;font-family:Arial,sans-serif;padding:20px 0;\">   <tr>     <td align=\"center\">        <!-- Main Container -->       <table width=\"95%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"max-width:700px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #dbe4ea;\">          <!-- Header -->         <tr>           <td align=\"center\" style=\"background-color:#0f766e;padding:30px 20px;color:white;\">             <h1 style=\"margin:0;font-size:28px;\">               HR Interview Scheduled             </h1>              <p style=\"margin-top:10px;font-size:15px;opacity:0.9;\">               Candidate interview details and meeting access             </p>           </td>         </tr>          <!-- Body -->         <tr>           <td style=\"padding:30px;color:#333333;line-height:1.6;\">              <p style=\"font-size:16px;margin-top:0;\">               Dear Recruiter,             </p>              <p style=\"font-size:15px;\">               This is to confirm that the HR interview has been successfully scheduled for the following candidate.             </p>              <!-- Interview Details Box -->             <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-top:20px;\">                <tr>                 <td colspan=\"2\" style=\"padding-bottom:20px;\">                   <h2 style=\"margin:0;color:#0f766e;font-size:22px;\">                     Interview Details                   </h2>                 </td>               </tr>                <tr>                 <td style=\"padding:10px 0;font-weight:bold;width:180px;\">                   Candidate Name                 </td>                  <td style=\"padding:10px 0;\">                   {{ $('Save Data').item.json.summary.replace('Interview with ', '') }}                 </td>               </tr>                <tr>                 <td style=\"padding:10px 0;font-weight:bold;\">                   Duration                 </td>                  <td style=\"padding:10px 0;\">                   Approximately 1 Hour                 </td>               </tr>                <tr>                 <td style=\"padding:10px 0;font-weight:bold;\">                   Platform                 </td>                  <td style=\"padding:10px 0;\">                   Google Meet                 </td>               </tr>                <tr>                 <td style=\"padding:10px 0;font-weight:bold;\">                   Date & Time                 </td>                  <td style=\"padding:10px 0;\">                   {{                    new Date($('Save Data').item.json.start.dateTime).toLocaleString('en-IN', {                     dateStyle: 'full',                     timeStyle: 'short'                   })                    }}                    <br><br>                    to                    <br><br>                    {{                    new Date($('Save Data').item.json.end.dateTime).toLocaleTimeString('en-IN', {                     timeStyle: 'short'                   })                    }}                 </td>               </tr>                <!-- Button -->               <tr>                 <td colspan=\"2\" align=\"center\" style=\"padding-top:30px;\">                    <a                      href=\"{{ $('Save Data').item.json.conferenceData.entryPoints[0].uri }}\"                     style=\"                       background-color:#0f766e;                       color:white;                       text-decoration:none;                       padding:14px 30px;                       border-radius:8px;                       display:inline-block;                       font-weight:bold;                       font-size:15px;                     \"                   >                     Join Google Meet                   </a>                  </td>               </tr>              </table>              <!-- Paragraphs -->             <p style=\"font-size:15px;margin-top:25px;\">               Please ensure you join the meeting a few minutes before the scheduled time. Kindly review the candidate profile and relevant interview notes beforehand.             </p>              <p style=\"font-size:15px;\">               In case of any scheduling conflicts or technical issues, please coordinate with the recruitment team.             </p>              <p style=\"font-size:15px;\">               Thank you for your participation in the recruitment process.             </p>              <!-- Signature -->             <p style=\"margin-top:35px;margin-bottom:0;\">               Best Regards,             </p>              <p style=\"margin-top:6px;font-weight:bold;color:#0f766e;font-size:16px;\">               HR Recruitment Team             </p>            </td>         </tr>          <!-- Footer -->         <tr>           <td align=\"center\" style=\"background:#ecfeff;padding:16px;font-size:13px;color:#64748b;\">             Automated recruiter interview notification           </td>         </tr>        </table>      </td>   </tr> </table>",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldName": "Name",
+              "fieldType": "hiddenField",
+              "fieldValue": "={{ $('Save Data').item.json.summary.replace('Interview with ', '') }}"
+            },
+            {
+              "fieldLabel": "Overall Hiring Recommendation",
+              "fieldType": "dropdown",
+              "defaultValue": "Neutral",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Strong Reject"
+                  },
+                  {
+                    "option": "Reject"
+                  },
+                  {
+                    "option": "Leaning Reject"
+                  },
+                  {
+                    "option": "Neutral"
+                  },
+                  {
+                    "option": "Leaning Hire"
+                  },
+                  {
+                    "option": "Hire"
+                  },
+                  {
+                    "option": "Strong Hire"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Technical Understanding",
+              "fieldType": "dropdown",
+              "defaultValue": "Good",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Poor"
+                  },
+                  {
+                    "option": "Average"
+                  },
+                  {
+                    "option": "Good"
+                  },
+                  {
+                    "option": "Excellent"
+                  },
+                  {
+                    "option": "Outstanding"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Communication Skills",
+              "fieldType": "dropdown",
+              "defaultValue": "Good",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Poor"
+                  },
+                  {
+                    "option": "Fair"
+                  },
+                  {
+                    "option": "Good"
+                  },
+                  {
+                    "option": "Very Good"
+                  },
+                  {
+                    "option": "Excellent"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Confidence Level",
+              "fieldType": "dropdown",
+              "defaultValue": "Moderate",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Low"
+                  },
+                  {
+                    "option": "Moderate"
+                  },
+                  {
+                    "option": "High"
+                  },
+                  {
+                    "option": "Exceptional"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Cultural / Team Fit",
+              "fieldType": "dropdown",
+              "defaultValue": "Good Fit",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Poor Fit"
+                  },
+                  {
+                    "option": "Average Fit"
+                  },
+                  {
+                    "option": "Good Fit"
+                  },
+                  {
+                    "option": "Excellent Fit"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Recommended Role",
+              "fieldType": "dropdown",
+              "defaultValue": "Not Recommended",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Intern"
+                  },
+                  {
+                    "option": "Junior Developer"
+                  },
+                  {
+                    "option": "Associate Engineer"
+                  },
+                  {
+                    "option": "Software Engineer"
+                  },
+                  {
+                    "option": "Not Recommended"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Enter Now",
+          "responseFormTitle": "Candidate Interview Evaluation Form",
+          "responseFormDescription": "Please complete the interview evaluation form below. Your feedback will help us assess the candidate’s technical skills, communication abilities, and overall suitability for the role.",
+          "responseFormButtonLabel": "Submit",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        288
+      ],
+      "id": "c59232b3-410b-4caa-849e-0558677af2e5",
+      "name": "Send message and wait for response",
+      "webhookId": "5f94d1c9-168b-4f37-a30c-e3130241a228",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 249424902,
+          "mode": "list",
+          "cachedResultName": "HR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lDxqC071diJ4oOwnlVQWaxBBumxyIPqrzLoUi_5Uxrg/edit#gid=249424902"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.data.Name }}",
+            "Technical Understanding": "={{ $json.data['Technical Understanding'] }}",
+            "Communication Skills": "={{ $json.data['Communication Skills'] }}",
+            "Confidence Level": "={{ $json.data['Confidence Level'] }}",
+            "Culture Fit": "={{ $json.data['Cultural / Team Fit'] }}",
+            "Recommended role": "={{ $json.data['Recommended Role'] }}",
+            "HR Hire Recommendation": "={{ $json.data['Overall Hiring Recommendation'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HR Hire Recommendation",
+              "displayName": "HR Hire Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Technical Understanding",
+              "displayName": "Technical Understanding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Communication Skills",
+              "displayName": "Communication Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confidence Level",
+              "displayName": "Confidence Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Culture Fit",
+              "displayName": "Culture Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommended role",
+              "displayName": "Recommended role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        288
+      ],
+      "id": "39e5d579-930a-469e-9320-c24e65d8b4ed",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIp7Cr5PCM680JSY",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "automatedn8nworkflow@gmail.com",
+        "subject": "Recruitment Interview Cycle Completed",
+        "emailType": "text",
+        "message": "=Dear HR Team,\n\nThis is to inform you that the scheduled interview and evaluation process for all candidates has been successfully completed.\n\nAll recruiter feedback forms have been submitted and recorded in the recruitment system. The interview workflow cycle has now officially concluded.\n\nThe collected interview data, hiring recommendations, and recruiter feedback are now available for final review and decision-making.\n\nThank you for coordinating and participating in the recruitment process.\n\nBest Regards,\nAI Recruitment Automation System",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "849d3362-df50-4551-85c5-df33b262b1a5",
+      "name": "Send a message1",
+      "webhookId": "0a4077af-b55f-48b3-8509-aa11935e4c7d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "hr-interview",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        144
+      ],
+      "id": "062c9f5c-3d09-4310-8754-f0a72733b3bf",
+      "name": "Webhook",
+      "webhookId": "c93c82f3-9faa-4082-80ab-3f293a92fdf5"
+    },
+    {
+      "parameters": {
+        "url": "https://yukisf.app.n8n.cloud/webhook/hire-reject",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "902b6960-fe22-43bd-b016-e03512d33d62",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Data": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c47a3f30-77bc-4072-855a-17a7d3329de9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f596318a6c87b9ecf5b99de2a888e1d8d4225b868e289ef3610d8c489e81edd"
+  },
+  "id": "7pD5ikIsiCZqK0Np",
+  "tags": []
+}
