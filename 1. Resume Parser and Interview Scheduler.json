@@ -1,0 +1,566 @@
+{
+  "name": "1. Resume Parser and Interview Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        320
+      ],
+      "id": "a1aa70ff-1e9d-4d22-93b0-2d60b89efe90",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        0,
+        192
+      ],
+      "id": "8ebcd9d3-dba0-4bbb-90d2-e4f62a6f857c",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        192
+      ],
+      "id": "456ec97c-73c8-403f-a83c-254462e76c61",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"fullName\": \"John Doe\",\n\t\"email\": \"johndoe@gmail.com\",\n\t\"primaryLanguages\": \"Python and C++\",\n\t\"notableQualifications\": \"The applicant is completing a degree in Computer Science Engineering\",\n\t\"notableWorkExperience\": \"The applicant has built several personal projects, including deploying a machine learning model using Python and Streamlit\",\n\t\"Recommended\": true\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        416
+      ],
+      "id": "0f8e3346-2687-4703-8b5f-299b21e6e66d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "automatedn8nworkflow@gmail.com",
+          "mode": "list",
+          "cachedResultName": "automatedn8nworkflow@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        624
+      ],
+      "id": "aef47f7f-8126-46e9-ac45-ac0a319cba88",
+      "name": "GetCalendarEvents",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gigYxM7aYNTCeej7",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "automatedn8nworkflow@gmail.com",
+          "mode": "list",
+          "cachedResultName": "automatedn8nworkflow@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('attendees0_Attendees', ``, 'string') }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        624
+      ],
+      "id": "b37ac1f8-d87a-44f5-8136-5f3f6c6d1672",
+      "name": "CreateCalendarEvent",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gigYxM7aYNTCeej7",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "automatedn8nworkflow+HR@gmail.com",
+        "subject": "Approval Required",
+        "message": "=Please approve or disapprove this applicant?\n\nApplicant Details:\nName: {{ $json.output.fullName }}\nEmail: {{ $json.output.email }}\n\nExperience with Languages: {{ $json.output.primaryLanguages }}\n\nNotable Qualifications:\n{{ $json.output.notableQualifications }}\n\nNotable Work Experience\n{{ $json.output.notableWorkExperience }}\n\nMy Recommendation\n{{ ($json.output.Recommended?\"I recommend this applicant\":\"I do not recommend this applicant\") }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        192
+      ],
+      "id": "f9fd4991-a1ad-44ee-996d-b9164548b906",
+      "name": "SendApprovalMessage",
+      "webhookId": "7c71e5a3-28cf-4cdc-8f94-04058cd8dab1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5d9ea58d-516c-406c-b492-74ef176f6651",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        320
+      ],
+      "id": "84d8c097-9b03-4b60-9fdf-97f2c30d1417",
+      "name": "IfApproved"
+    },
+    {
+      "parameters": {
+        "sendTo": "automatedn8nworkflow+HR@gmail.com",
+        "subject": "Screening Completed",
+        "emailType": "text",
+        "message": "Resume Screening Has Completed Succesfully.\n\nPlease Check Your Google Calendar To Know More About The Upcoming Interview Rounds.",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Resume Screener n8n"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dd7f6f34-59cc-43de-a48e-3f1d769dc413",
+      "name": "Send Completion Message",
+      "webhookId": "d1a47168-6bc2-4ba0-b032-7ae28a3f6c6c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7PTh2SnGQn8Qg7i",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "'1HvNCueQ7xx_wpDOhfy71eKpq2zyrkbZd' in parents and mimeType = \"application/pdf\"",
+        "returnAll": true,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        320
+      ],
+      "id": "04180983-ed70-44dd-a71a-4a596c419e28",
+      "name": "Search For Resume",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xis1t8wp8N0aZ4E1",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Please analyse the following resume content and return relevant details about the applicant and your recommendation about the applicants suitability to fill the position as a fresher software developer: {{ $json.text }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "# Role\nYou are a Human Resources employee working for a software development company. Your role is to analyse resumes of applicants for an entry-level fresher software development position where the applicant must possess foundational skills in at least one major programming language such as Python, Java, or C++, and have appropriate academic or project experience.\n\nInstructions\nFollow these steps in analysing a resume and outputting relevant data in your response\n1. Read through the provided information \n2. Get the applicants full name and email address from the resume\n3. Identify the primary programming languages the applicant knows\n4. Get notable features about the applicants academic qualifications\n5. Get notable features about the applicants project work, such as university assignments or personal portfolio projects\n6. Conclude as to whether you would recommend the applicant for the position of fresher software developer\n\nRules\n1. Foundational knowledge in a core programming language (Python, Java, or C++) is the most important requirement. If the applicant does not demonstrate this knowledge through coursework or projects, don't recommend the applicant for the position.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        192
+      ],
+      "id": "bc7b2d0b-c8cd-412d-bd5c-266b24c3e96d",
+      "name": "Resume Summarizer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an assistant that schedules interviews in Google Calendar.\n\nInstructions\n\nFetch Events\nCall the GetCalendarEvents tool to retrieve all existing events between Monday 00:00 and Friday 23:59 of the next calendar week after {{ $now }}.\n\nIf today is within this week, you must skip it. Only consider next week.\n\nFind Availability\nAnalyze the retrieved events. Identify the earliest available 1-hour free slot within working hours (08:00–18:00 local time).\n\nDo not select a time that overlaps with an existing event.\n\nDo not schedule outside 08:00–18:00.\n\nOnly use dates from next week’s Monday–Friday window.\n\nSchedule Event\nOnce a free slot is found, call the CreateCalendarEvent tool with:\n\nsummary: \"Interview with {{ $('Resume Summarizer').item.json.output.fullName }}\"\n\nstart.dateTime: the beginning of the identified 1-hour slot (ISO 8601 format).\n\nend.dateTime: the start time plus exactly 60 minutes.\n\nattendee:\n\n{\"email\": \"{{ $('Resume Summarizer').item.json.output.email }}\"}\n\nReturn Confirmation\nReturn only the scheduled event details as valid JSON in the following format:\n\n{\n  \"summary\": \"Interview with {{ $('Resume Summarizer').item.json.output.fullName }}\",\n  \"start\": { \"dateTime\": \"YYYY-MM-DDTHH:MM:SS\" },\n  \"end\": { \"dateTime\": \"YYYY-MM-DDTHH:MM:SS\" },\n  \"attendees\": { \"email\": \"{{ $('Resume Summarizer').item.json.output.email }}\" }\n}\n\nRules\n\nToday’s date/time is {{ $now }}.\n\nOnly consider Monday–Friday of the next calendar week.\n\nThe event must last exactly 60 minutes.\n\nRespect all existing events from GetCalendarEvents.\n\nOutput must be only valid JSON (no explanations, no markdown).",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1296,
+        400
+      ],
+      "id": "393394af-6b12-442a-aa5d-e3748f24656d",
+      "name": "Calendar Schedular"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        416
+      ],
+      "id": "789ea150-d4d0-4f35-a134-ec2d20a07701",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "SuQXDpPcOxgnL7OM",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        624
+      ],
+      "id": "66e3a628-d979-4e3a-9725-9afcf25c2faf",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "SuQXDpPcOxgnL7OM",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://yukisf.app.n8n.cloud/webhook/ai-interview",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.query.name }}"
+            },
+            {
+              "name": "role",
+              "value": "{{ $json.query.role }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.query.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "0ddfddfb-c3f0-41c4-b1ce-b6ad8b3c0375",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "path": "start",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -672,
+        320
+      ],
+      "id": "c5f1bad4-547e-408c-9102-5b348716c8f7",
+      "name": "Webhook",
+      "webhookId": "444fbe96-eb63-452f-a41d-2c107b882934"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send Completion Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Resume Summarizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Resume Summarizer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetCalendarEvents": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Schedular",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateCalendarEvent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Schedular",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendApprovalMessage": {
+      "main": [
+        [
+          {
+            "node": "IfApproved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IfApproved": {
+      "main": [
+        [
+          {
+            "node": "Calendar Schedular",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search For Resume": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Summarizer": {
+      "main": [
+        [
+          {
+            "node": "SendApprovalMessage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Schedular": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Summarizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar Schedular",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Completion Message": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Search For Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6f2e5b5d-c5b0-45cb-8b91-8f5a79b1c745",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f596318a6c87b9ecf5b99de2a888e1d8d4225b868e289ef3610d8c489e81edd"
+  },
+  "id": "zyCFzIjnh6RLL7XJ",
+  "tags": []
+}
